@@ -55,21 +55,18 @@ export default BaseAdapter.extend({
   },
 
   trackEvent(options = {}) {
-    const compactedOptions = compact(options);
-    const sendEvent = { hitType: 'event' };
-    let gaEvent = {};
+    let compactedOptions = compact(options);
+    let eventData = { hitType: 'event' };
 
-    if (compactedOptions.nonInteraction) {
-      gaEvent.nonInteraction = compactedOptions.nonInteraction;
-      delete compactedOptions.nonInteraction;
-    }
+    ['category', 'action', 'label', 'value'].forEach((key) => {
+      if (compactedOptions[key] !== undefined && compactedOptions[key] !== null) {
+        const capitalizedKey = capitalize(key);
+        eventData[`event${capitalizedKey}`] = compactedOptions[key];
+        delete compactedOptions[key];
+      }
+    })
 
-    for (let key in compactedOptions) {
-      const capitalizedKey = capitalize(key);
-      gaEvent[`event${capitalizedKey}`] = compactedOptions[key];
-    }
-
-    const event = assign(sendEvent, gaEvent);
+    const event = assign(eventData, compactedOptions);
     if (canUseDOM) {
       window.ga('send', event);
     }

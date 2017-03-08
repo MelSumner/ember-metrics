@@ -176,9 +176,13 @@ contentSecurityPolicy: {
 }
 ```
 
-## Usage
+## Track route changes:
 
-In order to use the addon, you must first [configure](#configuration) it, then inject it into any Object registered in the container that you wish to track. For example, you can call a `trackPage` event across all your analytics services whenever you transition into a route, like so:
+In order to use the addon, you must first [configure](#configuration)
+it, then inject it into any Object registered in the container that
+you wish to track. For example, you can call a `trackPage` event across
+ all your analytics services whenever you transition into a route,
+ like so:
 
 ```js
 // app/router.js
@@ -216,6 +220,51 @@ metrics.trackPage('GoogleAnalytics', {
   title: 'My Awesome App'
 });
 ```
+
+### Track events:
+```js
+metrics.trackEvent({
+  category: 'Video',
+  action: 'Play',
+  label: 'Name of video', 
+  value: 2
+});
+```
+
+If you want to track external link navigations, we can use a technique
+from google's [autotrack](https://github.com/googleanalytics/autotrack/) library,
+and simply open the link in a new tab, unless the browser supports `navigator.sendBeacon`.
+This prevents the tracking request from getting canceled when the page is unloading.
+```html
+<a href="https://external-site.com"
+   {{action "sendToExternal" "external-site.com" preventDefault=false}}
+   target="{{outboundLinkTarget}}">
+   Check us out on external-site.com!!
+</a>
+```
+
+```js
+import Ember from 'ember';
+
+export default Ember.Component.extend({
+  metrics: Ember.inject.service(),
+  // Opens outbound links in a new tab if the browser doesn't support
+  // the beacon transport method.
+  //1. https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+  //Example of 1: https://github.com/googleanalytics/autotrack/blob/master/lib/plugins/outbound-link-tracker.js#L74
+  outboundLinkTarget: navigator.sendBeacon ? '_self' : '_blank',
+  actions: {
+    sendToExternal(externalSite) {
+      this.get('metrics').trackEvent({
+        category: 'Outbound Link',
+        action: `to:${externalSite}`,
+        transport: 'beacon'
+        //,hitCallback: ()=>{window.close()} //could do this if we don't like opening a new tab
+      })
+    }
+  }})
+```
+
 
 #### Context
 Often, you may want to include information like the current user's name with every event or page view that's tracked. Any properties that are set on `metrics.context` will be merged into options for every Service call.
