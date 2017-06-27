@@ -68,29 +68,32 @@ test('#activateAdapters activates an array of adapters', function(assert) {
 
 test('#activateAdapters is idempotent', function(assert) {
   const service = this.subject({ options });
-  service.activateAdapters([
-    {
-      name: 'GoogleAnalytics',
-      environments: ['all'],
-      config: {
-        id: 'I like pie'
+  Ember.run(function() {
+    service.activateAdapters([
+      {
+        name: 'GoogleAnalytics',
+        environments: ['all'],
+        config: {
+          id: 'I like pie'
+        }
+      },
+      {
+        name: 'Mixpanel',
+        environments: ['all'],
+        config: {
+          id: 'I like pie'
+        }
+      },
+      {
+        name: 'LocalDummyAdapter',
+        environments: ['all'],
+        config: {
+          id: 'I like pie'
+        }
       }
-    },
-    {
-      name: 'Mixpanel',
-      environments: ['all'],
-      config: {
-        id: 'I like pie'
-      }
-    },
-    {
-      name: 'LocalDummyAdapter',
-      environments: ['all'],
-      config: {
-        id: 'I like pie'
-      }
-    }
-  ]);
+    ]);
+  });
+
   assert.equal(get(service, '_adapters.GoogleAnalytics.config.id'), 'UA-XXXX-Y', 'it does not override the GoogleAnalytics adapter');
   assert.equal(get(service, '_adapters.Mixpanel.config.token'), '0f76c037-4d76-4fce-8a0f-a9a8f89d1453', 'it does not override the Mixpanel adapter');
   assert.equal(get(service, '_adapters.LocalDummyAdapter.config.foo'), 'bar', 'it does not override the LocalDummyAdapter');

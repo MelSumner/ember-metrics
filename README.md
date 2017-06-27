@@ -71,6 +71,8 @@ module.exports = function(environment) {
         environments: ['development', 'production'],
         config: {
           id: 'UA-XXXX-Y',
+          // optionally you can provide the name if you like to use multiple GA adapters
+          name: 'MyApplication',
           // Use `analytics_debug.js` in development
           debug: environment === 'development',
           // Use verbose tracing of GA events

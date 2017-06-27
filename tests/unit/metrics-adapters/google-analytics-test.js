@@ -23,7 +23,19 @@ test('#identify calls ga with the right arguments', function(assert) {
   adapter.identify({
     distinctId: 123
   });
-  assert.ok(stub.calledWith('set', 'userId', 123), 'it sends the correct arguments');
+  assert.ok(stub.calledWith('GoogleAnalytics.set', 'userId', 123), 'it sends the correct arguments');
+});
+
+test('#identify calls ga with the right arguments if custom name is provided', function(assert) {
+  config = Object.assign(config, { name: 'MyCustomAnalytics' });
+  const adapter = this.subject({ config });
+  const stub = sandbox.stub(window, 'ga', () => {
+    return true;
+  });
+  adapter.identify({
+    distinctId: 123
+  });
+  assert.ok(stub.calledWith('MyCustomAnalytics.set', 'userId', 123), 'it sends the correct arguments');
 });
 
 test('#trackEvent returns the correct response shape', function(assert) {
