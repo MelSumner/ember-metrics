@@ -36,12 +36,10 @@ export default BaseAdapter.extend({
   },
 
   identify(options = {}) {
-    const { appId } = get(this, 'config');
     const compactedOptions = compact(options);
     const { distinctId } = compactedOptions;
     const props = without(compactedOptions, 'distinctId');
 
-    props.app_id = appId;
     if (distinctId) {
       props.user_id = distinctId;
     }
@@ -49,10 +47,17 @@ export default BaseAdapter.extend({
     assert(`[ember-metrics] You must pass \`distinctId\` or \`email\` to \`identify()\` when using the ${this.toString()} adapter`, props.email || props.user_id);
 
     const method = this.booted ? 'update' : 'boot';
-    if (canUseDOM) {
-      window.Intercom(method, props);
-      this.booted = true;
-    }
+
+    this[method](props);
+  },
+
+  update(props = {}) {
+    this._intercomMethod('update', props);
+  },
+
+  boot(props = {}) {
+    this._intercomMethod('boot', props);
+    this.booted = true;
   },
 
   trackEvent(options = {}) {
@@ -77,5 +82,15 @@ export default BaseAdapter.extend({
       $('script[src*="intercom"]').remove();
       delete window.Intercom;
     }
-  }
+  },
+
+  _intercomMethod(method, props) {
+    const { appId } = get(this, 'config');
+
+    props.app_id = appId;
+
+    if (canUseDOM) {
+      window.Intercom(method, props);
+    }
+  },
 });

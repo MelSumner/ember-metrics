@@ -2,18 +2,20 @@ import Ember from 'ember';
 import { moduleFor, test } from 'ember-qunit';
 import sinon from 'sinon';
 
-const { get, set } = Ember;
+const { assign, get, set } = Ember;
 const environment = 'test';
-let sandbox, metricsAdapters, options;
+let sandbox, metricsAdapters, options, intercomAppId;
 
 moduleFor('service:metrics', 'Unit | Service | metrics', {
   needs: [
     'ember-metrics@metrics-adapter:google-analytics',
     'ember-metrics@metrics-adapter:mixpanel',
+    'ember-metrics@metrics-adapter:intercom',
     'metrics-adapter:local-dummy-adapter'
   ],
   beforeEach() {
     sandbox = sinon.sandbox.create();
+    intercomAppId = 'jej2i3';
 
     metricsAdapters = [
       {
@@ -21,6 +23,13 @@ moduleFor('service:metrics', 'Unit | Service | metrics', {
         environments: ['all'],
         config: {
           id: 'UA-XXXX-Y'
+        }
+      },
+      {
+        name: 'Intercom',
+        environments: ['all'],
+        config: {
+          appId: intercomAppId
         }
       },
       {
@@ -135,6 +144,35 @@ test('#invoke invokes the named method on a single activated adapter', function(
   assert.equal(MixpanelSpy.callCount, 0, 'it does not invoke other adapters');
 });
 
+test('#invoke invokes methods on Intercom', function(assert) {
+  const service = this.subject({ options });
+  const IntercomStub = sandbox.stub(window, 'Intercom');
+  const IntercomBootSpy = sandbox.spy(get(service, '_adapters.Intercom'), 'boot');
+  const IntercomUpdateSpy = sandbox.spy(get(service, '_adapters.Intercom'), 'update');
+  const defaultOpts = { app_id: intercomAppId };
+  const opts = {
+    userId: '1e810c197e',
+    name: 'Bill Limbergh',
+    email: 'bill@initech.com'
+  };
+  const fullOpts = assign({}, defaultOpts, opts);
+  service.invoke('boot', 'Intercom', opts);
+  service.invoke('boot', 'Intercom', {});
+  service.invoke('update', 'Intercom', opts);
+  service.invoke('update', 'Intercom', {});
+
+  assert.ok(IntercomStub.firstCall.calledWith('boot', fullOpts), 'it sends boot the correct arguments');
+  assert.ok(IntercomStub.secondCall.calledWith('boot', defaultOpts), 'it sends boot the correct arguments');
+  assert.ok(IntercomStub.thirdCall.calledWith('update', fullOpts), 'it sends update the correct arguments');
+  assert.ok(IntercomStub.lastCall.calledWith('update', defaultOpts), 'it sends update the correct arguments');
+  assert.equal(IntercomBootSpy.callCount, 2, 'it invokes the boot method on the adapter');
+  assert.ok(IntercomBootSpy.firstCall.calledWith(fullOpts), 'it invokes with the correct arguments');
+  assert.ok(IntercomBootSpy.secondCall.calledWith(defaultOpts), 'it invokes with the correct arguments');
+  assert.equal(IntercomUpdateSpy.callCount, 2, 'it invokes the update method on the adapter');
+  assert.ok(IntercomUpdateSpy.firstCall.calledWith(fullOpts), 'it invokes with the correct arguments');
+  assert.ok(IntercomUpdateSpy.secondCall.calledWith(defaultOpts), 'it invokes with the correct arguments');
+});
+
 test('#invoke invokes the named methods on a whitelist of activated adapters', function(assert) {
   const service = this.subject({ options });
   const MixpanelStub = sandbox.stub(window.mixpanel, 'identify');
@@ -210,11 +248,13 @@ test('it implements standard contracts', function(assert) {
   delete window.mixpanel.toString;
   sandbox.stub(window.mixpanel);
   sandbox.stub(window, 'ga');
+  sandbox.stub(window, 'Intercom');
   const spy = sandbox.spy(service, 'invoke');
   const expectedContracts = [ 'identify', 'alias', 'trackEvent', 'trackPage' ];
 
   expectedContracts.forEach((contractName) => {
     service[contractName]({
+      email: 'testy@example.com',
       foo: 'bar'
     });
   });
