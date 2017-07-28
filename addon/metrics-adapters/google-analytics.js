@@ -21,7 +21,7 @@ export default BaseAdapter.extend({
 
   init() {
     const config = copy(get(this, 'config'));
-    const { id, sendHitTask, trace } = config;
+    const { id, sendHitTask, trace, setFields } = config;
     let { debug } = config;
 
     assert(`[ember-metrics] You must pass a valid \`id\` to the ${this.toString()} adapter`, id);
@@ -31,6 +31,7 @@ export default BaseAdapter.extend({
     if (debug) { delete config.debug; }
     if (sendHitTask) { delete config.sendHitTask; }
     if (trace) { delete config.trace; }
+    if (setFields) { delete config.setFields; }
 
     const hasOptions = isPresent(Object.keys(config));
 
@@ -55,6 +56,10 @@ export default BaseAdapter.extend({
 
       if (sendHitTask === false) {
         window.ga('set', 'sendHitTask', null);
+      }
+
+      if (setFields) {
+        window.ga('set', setFields);
       }
 
     }
