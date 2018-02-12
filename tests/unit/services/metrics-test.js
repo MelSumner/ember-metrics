@@ -11,7 +11,8 @@ moduleFor('service:metrics', 'Unit | Service | metrics', {
     'ember-metrics@metrics-adapter:google-analytics',
     'ember-metrics@metrics-adapter:mixpanel',
     'metrics-adapter:local-dummy-adapter',
-    'service:application'
+    'service:application',
+    'config:environment'
   ],
   beforeEach() {
     sandbox = sinon.sandbox.create();
@@ -40,10 +41,10 @@ moduleFor('service:metrics', 'Unit | Service | metrics', {
       }
     ];
 
-    options = {
+    this.register('config:environment', {
       metricsAdapters,
       environment
-    };
+    });
 
     window.ga = window.ga || function() {};
   },
@@ -233,26 +234,26 @@ test('it implements standard contracts', function(assert) {
 });
 
 test('it does not activate adapters that are not in the current app environment', function(assert) {
-  const service = this.subject({
-    options: {
-      metricsAdapters: [
-        {
-          name: 'GoogleAnalytics',
-          config: {
-            id: 'UA-XXXX-Y'
-          }
-        },
-        {
-          name: 'LocalDummyAdapter',
-          environments: ['production'],
-          config: {
-            foo: 'bar'
-          }
+  this.register('config:environment', {
+    metricsAdapters: [
+      {
+        name: 'GoogleAnalytics',
+        config: {
+          id: 'UA-XXXX-Y'
         }
-      ]
-    },
+      },
+      {
+        name: 'LocalDummyAdapter',
+        environments: ['production'],
+        config: {
+          foo: 'bar'
+        }
+      }
+    ],
     environment
   });
+
+  let service = this.subject();
 
   assert.ok(get(service, '_adapters.GoogleAnalytics'), 'it activated the GoogleAnalytics adapter');
   assert.notOk(get(service, '_adapters.LocalDummyAdapter'), 'it did not activate the LocalDummyAdapter');

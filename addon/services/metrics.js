@@ -1,7 +1,7 @@
 import { assign } from '@ember/polyfills';
 import Service from '@ember/service';
 import { assert } from '@ember/debug';
-import { set, get, getWithDefault } from '@ember/object';
+import { set, get } from '@ember/object';
 import { copy } from '@ember/object/internals';
 import { A as emberArray, makeArray } from '@ember/array';
 import { dasherize } from '@ember/string';
@@ -50,14 +50,23 @@ export default Service.extend({
    * @return {Void}
    */
   init() {
-    const adapters = getWithDefault(this, 'options.metricsAdapters', emberArray());
     const owner = getOwner(this);
+    const config = owner.factoryFor('config:environment').class;
+
+    const {
+      metricsAdapters = emberArray(),
+      environment = 'development'
+    } = config;
+
     owner.registerOptionsForType('ember-metrics@metrics-adapter', { instantiate: false });
     owner.registerOptionsForType('metrics-adapter', { instantiate: false });
-    set(this, 'appEnvironment', getWithDefault(this, 'options.environment', 'development'));
+
+    set(this, 'options', { metricsAdapters, environment });
+    set(this, 'appEnvironment', environment);
     set(this, '_adapters', {});
     set(this, 'context', {});
-    this.activateAdapters(adapters);
+
+    this.activateAdapters(metricsAdapters);
     this._super(...arguments);
   },
 

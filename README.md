@@ -376,6 +376,7 @@ For unit tests, you will need to specify the adapters in use under `needs`, like
 moduleFor('route:foo', 'Unit | Route | foo', {
   needs: [
     'service:metrics',
+    'config:environment',
     'ember-metrics@metrics-adapter:google-analytics', // bundled adapter
     'ember-metrics@metrics-adapter:mixpanel', // bundled adapter
     'metrics-adapter:local-dummy-adapter' // local adapter
