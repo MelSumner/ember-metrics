@@ -90,7 +90,12 @@ module.exports = function(environment) {
           // Ensure development env hits aren't sent to GA
           sendHitTask: environment !== 'development',
           // Specify Google Analytics plugins
-          require: ['ecommerce']
+          require: ['ecommerce'],
+          // set common field on tracker object
+          set: {
+            // https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#hostname
+            hostname: 'myawesomehost.com'
+          }
         }
       },
       {
