@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import canUseDOM from '../utils/can-use-dom';
+import canUseMetrics from '../utils/can-use-metrics';
 import objectTransforms from '../utils/object-transforms';
 import BaseAdapter from './base';
 import { assert } from '@ember/debug';
@@ -18,7 +19,7 @@ export default BaseAdapter.extend({
 
     assert(`[ember-metrics] You must pass a valid \`id\` to the ${this.toString()} adapter`, id);
 
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       /* eslint-disable */
       !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
       n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
@@ -36,7 +37,7 @@ export default BaseAdapter.extend({
   },
 
   trackEvent(options = {}) {
-    if (!canUseDOM) { return; }
+    if (!canUseDOM || !canUseMetrics) { return; }
 
     const compactedOptions = compact(options);
     const { event } = compactedOptions;
@@ -50,13 +51,13 @@ export default BaseAdapter.extend({
   },
 
   trackPage(options = {}) {
-    if (!canUseDOM) { return; }
+    if (!canUseDOM || !canUseMetrics) { return; }
 
     window.fbq('track', 'PageView', options);
   },
 
   willDestroy() {
-    if (!canUseDOM) { return; }
+    if (!canUseDOM || canUseMetrics) { return; }
 
     $('script[src*="fbevents.js"]').remove();
     delete window.fbq;

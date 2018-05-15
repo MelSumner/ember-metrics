@@ -2,6 +2,7 @@ import { assert } from '@ember/debug';
 import $ from 'jquery';
 import { get } from '@ember/object';
 import canUseDOM from '../utils/can-use-dom';
+import canUseMetrics from '../utils/can-use-metrics';
 import BaseAdapter from './base';
 
 export default BaseAdapter.extend({
@@ -15,7 +16,7 @@ export default BaseAdapter.extend({
 
     assert(`[ember-metrics] You must pass a \`piwikUrl\` and a \`siteId\` to the ${this.toString()} adapter`, piwikUrl && siteId);
 
-    if(canUseDOM) {
+    if(canUseDOM && canUseMetrics) {
       window._paq = window._paq || [];
       (function() {
         window._paq.push(['setTrackerUrl', `${piwikUrl}/piwik.php`]);
@@ -27,26 +28,26 @@ export default BaseAdapter.extend({
   },
 
   identify(options = {}) {
-    if(canUseDOM) {
+    if(canUseDOM && canUseMetrics) {
       window._paq.push(['setUserId', options.userId]);
     }
   },
 
   trackEvent(options = {}) {
-    if(canUseDOM) {
+    if(canUseDOM && canUseMetrics) {
       window._paq.push(['trackEvent', options.category, options.action, options.name, options.value]);
     }
   },
 
   trackPage(options = {}) {
-    if(canUseDOM) {
+    if(canUseDOM && canUseMetrics) {
       window._paq.push(['setCustomUrl', options.page]);
       window._paq.push(['trackPageView', options.title]);
     }
   },
 
   willDestroy() {
-    if(canUseDOM) {
+    if(canUseDOM && canUseMetrics) {
       $('script[src*="piwik"]').remove();
       delete window._paq;
     }

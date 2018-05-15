@@ -6,6 +6,7 @@ import { get } from '@ember/object';
 import $ from 'jquery';
 import { capitalize } from '@ember/string';
 import canUseDOM from '../utils/can-use-dom';
+import canUseMetrics from '../utils/can-use-metrics';
 import objectTransforms from '../utils/object-transforms';
 import BaseAdapter from './base';
 
@@ -32,7 +33,7 @@ export default BaseAdapter.extend({
 
     const hasOptions = isPresent(Object.keys(config));
 
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
 
       /* eslint-disable */
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -68,7 +69,7 @@ export default BaseAdapter.extend({
     const compactedOptions = compact(options);
     const { distinctId } = compactedOptions;
 
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       window.ga('set', 'userId', distinctId);
     }
   },
@@ -94,7 +95,7 @@ export default BaseAdapter.extend({
     }
 
     const event = assign(sendEvent, gaEvent);
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       window.ga('send', event);
     }
 
@@ -107,11 +108,11 @@ export default BaseAdapter.extend({
 
     const event = assign(sendEvent, compactedOptions);
     for (let key in compactedOptions) {
-      if (compactedOptions.hasOwnProperty(key)) {
+      if (compactedOptions.hasOwnProperty(key) && canUseMetrics) {
         window.ga('set', key, compactedOptions[key]);
       }
     }
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       window.ga('send', sendEvent);
     }
 
@@ -119,7 +120,7 @@ export default BaseAdapter.extend({
   },
 
   willDestroy() {
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       $('script[src*="google-analytics"]').remove();
       delete window.ga;
     }

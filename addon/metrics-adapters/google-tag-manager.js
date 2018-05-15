@@ -4,6 +4,7 @@ import $ from 'jquery';
 import { getWithDefault, set, get } from '@ember/object';
 import { capitalize } from '@ember/string';
 import canUseDOM from '../utils/can-use-dom';
+import canUseMetrics from '../utils/can-use-metrics';
 import objectTransforms from '../utils/object-transforms';
 import BaseAdapter from './base';
 
@@ -28,7 +29,7 @@ export default BaseAdapter.extend({
 
     set(this, 'dataLayer', dataLayer);
 
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       (function(w, d, s, l, i) {
         w[l] = w[l] || [];
         w[l].push({
@@ -57,7 +58,7 @@ export default BaseAdapter.extend({
       gtmEvent[`event${capitalizedKey}`] = compactedOptions[key];
     }
 
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       window[dataLayer].push(gtmEvent);
     }
 
@@ -73,7 +74,7 @@ export default BaseAdapter.extend({
 
     const pageEvent = assign(sendEvent, compactedOptions);
 
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       window[dataLayer].push(pageEvent);
     }
 
@@ -81,7 +82,7 @@ export default BaseAdapter.extend({
   },
 
   willDestroy() {
-    if (canUseDOM) {
+    if (canUseDOM && canUseMetrics) {
       $('script[src*="gtm.js"]').remove();
       delete window.dataLayer;
     }
