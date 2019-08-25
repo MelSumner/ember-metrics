@@ -24,9 +24,9 @@ export default BaseAdapter.extend({
 
     delete config.id;
     delete config.require;
+    delete config.sendHitTask;
 
     if (debug) { delete config.debug; }
-    if (sendHitTask) { delete config.sendHitTask; }
     if (trace) { delete config.trace; }
 
     const hasOptions = isPresent(Object.keys(config));
