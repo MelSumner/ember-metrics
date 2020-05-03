@@ -70,6 +70,25 @@ test('#trackPage calls `mixpanel.track` with the right arguments', function(asse
   assert.ok(stub.secondCall.calledWith('Page View', { page: '/products/1' }), 'it sends the correct arguments and options');
 });
 
+test('#trackPageEventName - test this property is ', function(assert) {
+  const baseConfig = { config };
+  const modifiedConfig = Object.assign({}, baseConfig);
+  modifiedConfig.config.trackPageEventName ='Yee Haw';
+  const adapter = this.subject(modifiedConfig);
+  const stub = sandbox.stub(window.mixpanel, 'track').callsFake(() => {
+    return true;
+  });
+  adapter.trackPage({
+    page: '/products/1'
+  });
+  adapter.trackPage({
+    event: 'Page View',
+    page: '/products/1'
+  });
+  assert.ok(stub.firstCall.calledWith('Yee Haw', { page: '/products/1' }), 'it sends the correct arguments and options');
+  assert.ok(stub.secondCall.calledWith('Page View', { page: '/products/1' }), 'it sends the correct arguments and options');
+});
+
 test('#alias calls `mixpanel.alias` with the right arguments', function(assert) {
   const adapter = this.subject({ config });
   const stub = sandbox.stub(window.mixpanel, 'alias').callsFake(() => {

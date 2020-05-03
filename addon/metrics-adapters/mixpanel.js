@@ -56,7 +56,10 @@ export default BaseAdapter.extend({
   },
 
   trackPage(options = {}) {
-    const event = { event: 'page viewed' };
+    const config = get(this, 'config');
+    let { trackPageEventName } = config;
+    trackPageEventName = trackPageEventName || 'page viewed';
+    const event = { event: trackPageEventName };
     const mergedOptions = assign(event, options);
 
     this.trackEvent(mergedOptions);
