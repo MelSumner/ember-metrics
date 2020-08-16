@@ -3,7 +3,7 @@ import removeFromDOM from '../utils/remove-from-dom';
 import BaseAdapter from './base';
 import { assert } from '@ember/debug';
 
-const { compact } = objectTransforms;
+const { compact, without } = objectTransforms;
 
 export default BaseAdapter.extend({
   toStringExtension() {
@@ -53,6 +53,17 @@ export default BaseAdapter.extend({
 
   trackPage(options = {}) {
     window.fbq('track', 'PageView', options);
+  },
+
+  trackCustom(options = {}) {
+    if (!canUseDOM) { return; }
+
+    const compactedOptions = compact(options);
+    const { event } = compactedOptions;
+    const customOptions = without(options, 'event');
+
+    window.fbq('trackCustom', event, customOptions);
+
   },
 
   willDestroy() {

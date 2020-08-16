@@ -72,3 +72,8 @@ module('facebook-pixel adapter', function(hooks) {
     assert.ok((dataProcessingState == 1000), 'it sends the correct Data Processing State');
   });
 });
+
+test('#trackCustom calls `fbq.track` with the right arguments', function(assert) {
+  subject.trackCustom({ event: 'AdClick', opt1: 'bar', opt2: 'baz' });
+  assert.ok(fbq.calledWith('trackCustom', 'AdClick', { opt1: 'bar', opt2: 'baz' }), 'it sends the correct arguments and options');
+});
