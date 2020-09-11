@@ -62,6 +62,10 @@ Writing your own adapters for currently unsupported analytics services is easy t
 
     - `apiKey`: [API Key](https://developers.amplitude.com/#setting-up-our-sdks)
 
+1. `mParticle`
+
+    - `apiKey`: [API Key](https://docs.mparticle.com/developers/sdk/web/getting-started/)
+
 #### Community adapters
 
 1. `Adobe Dynamic Tag Management`
@@ -156,6 +160,18 @@ module.exports = function(environment) {
             },
             // ...other amplitude configuration options
             // https://developers.amplitude.com/#sdk-advanced-settings
+          }
+        }
+      },
+      {
+        name: 'mParticle',
+        environments: ['production'],
+        config: {
+          apiKey: 'mParticleAPIKey',
+          options: {
+            logLevel: 'verbose',
+            // ...other mParticle configuration options
+            // https://docs.mparticle.com/developers/sdk/web/getting-started/#sdk-configuration
           }
         }
       },

@@ -28,7 +28,8 @@ module.exports = function(environment) {
         'google-tag-manager',
         'piwik',
         'facebook-pixel',
-        'amplitude'
+        'amplitude',
+        'mParticle'
       ]
     },
 
