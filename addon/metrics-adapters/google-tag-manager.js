@@ -36,6 +36,18 @@ export default class GoogleTagManager extends BaseAdapter {
     })(window, document, 'script', this.dataLayer, id);
   }
 
+  identify(options = {}) {
+    const compactedOptions = compact(options);
+    const dataLayer = get(this, 'dataLayer');
+    const userId = get(this, 'userId');
+    const { distinctId } = compactedOptions;
+
+    if (canUseDOM && userId !== distinctId) {
+      set(this, 'userId', distinctId);
+      window[dataLayer].push({'userId': distinctId});
+    }
+  },
+
   trackEvent(options = {}) {
     const compactedOptions = compact(options);
     const dataLayer = this.dataLayer;

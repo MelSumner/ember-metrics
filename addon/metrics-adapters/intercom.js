@@ -28,11 +28,11 @@ export default class Intercom extends BaseAdapter {
     const compactedOptions = compact(options);
     const { distinctId } = compactedOptions;
     const props = without(compactedOptions, 'distinctId');
-
     props.app_id = appId;
     if (distinctId) {
       props.user_id = distinctId;
     }
+
 
     assert(`[ember-metrics] You must pass \`distinctId\` or \`email\` to \`identify()\` when using the ${this.toString()} adapter`, props.email || props.user_id);
 
@@ -55,6 +55,20 @@ export default class Intercom extends BaseAdapter {
 
     this.trackEvent(mergedOptions);
   }
+
+  boot(options = {}) {
+    if (this.booted) { return; }
+
+    const { appId } = get(this, 'config');
+    const props = compact(options);
+
+    props.app_id = appId;
+
+    if (canUseDOM) {
+      window.Intercom('boot', props);
+      this.booted = true;
+    }
+  },
 
   willDestroy() {
     removeFromDOM('script[src*="intercom"]');
