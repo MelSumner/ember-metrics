@@ -334,6 +334,10 @@ There are 4 main methods implemented by the service, with the same argument sign
 
   For analytics services that have identification functionality.
 
+- `group([analyticsName], options)`
+
+  For analytics services that associate individual user with a group.
+
 - `alias([analyticsName], options)`
 
   For services that implement it, this method notifies the analytics service that an anonymous user now has a unique identifier.

@@ -79,3 +79,11 @@ module('segment adapter', function(hooks) {
     assert.ok(stub.calledWith('foo', 'bar'), 'page called with default arguments');
   });
 });
+
+test('#group returns the correct response shape', function(assert) {
+  const adapter = this.subject({ config });
+  const stub = sandbox.stub(window.analytics, 'group');
+  adapter.group({ groupId: 123 });
+
+  assert.ok(stub.calledWith(), 'group called with the correct arguments');
+});
