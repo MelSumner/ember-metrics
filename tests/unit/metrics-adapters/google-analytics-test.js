@@ -146,3 +146,35 @@ module('google-analytics adapter', function(hooks) {
     assert.deepEqual(result, expectedResult, 'it sends the correct response shape');
   });
 });
+
+test('#set calls ga with the right arguments', function(assert) {
+  const adapter = this.subject({ config });
+  const stub = sandbox.stub(window, 'ga', () => {
+    return true;
+  });
+  adapter.setPage({
+    page: 'www.google.com'
+  });
+  assert.ok(stub.calledWith('set', 'page', 'www.google.com'), 'it sends the correct arguments');
+});
+
+test('#trackTiming returns the correct response shape', function(assert) {
+  const adapter = this.subject({ config });
+  sandbox.stub(window, 'ga');
+  const result = adapter.trackTiming(
+    {
+      hitType: 'timing',
+      timingCategory: 'timingPage',
+      timingVar: 'timingVar',
+      timingValue: 200
+    }
+  );
+  const expectedResult = {
+    hitType: 'timing',
+    timingCategory: 'timingPage',
+    timingVar: 'timingVar',
+    timingValue: 200
+  };
+
+  assert.deepEqual(result, expectedResult, 'it sends the correct response shape');
+});

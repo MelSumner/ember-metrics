@@ -103,6 +103,41 @@ export default class GoogleAnalytics extends BaseAdapter {
     return event;
   }
 
+  setPage(options = {}) {
+    let { page } = options ;
+    if (canUseDOM) {
+      window.ga('set', 'page', page);
+    }
+    return;
+  },
+  trackTiming(options = {}) {
+   const compactedOptions = compact(options);
+   const sendEvent = { hitType: 'timing' };
+   const eventKeys = ['category', 'var', 'label', 'value'];
+   let gaEvent = {};
+
+   if (compactedOptions.nonInteraction) {
+     gaEvent.nonInteraction = compactedOptions.nonInteraction;
+     delete compactedOptions.nonInteraction;
+   }
+
+   for (let key in compactedOptions) {
+     if (eventKeys.includes(key)) {
+       const capitalizedKey = capitalize(key);
+       gaEvent[`timing${capitalizedKey}`] = compactedOptions[key];
+     } else {
+       gaEvent[key] = compactedOptions[key];
+     }
+   }
+
+   const event = assign(sendEvent, gaEvent);
+   if (canUseDOM) {
+     window.ga('send', event);
+   }
+
+   return event;
+ },
+
   willDestroy() {
     removeFromDOM('script[src*="google-analytics"]');
 
