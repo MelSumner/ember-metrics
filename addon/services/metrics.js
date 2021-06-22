@@ -5,6 +5,7 @@ import { set } from '@ember/object';
 import { A as emberArray, makeArray } from '@ember/array';
 import { dasherize } from '@ember/string';
 import { getOwner } from '@ember/application';
+
 const { keys } = Object;
 
 export default class Metrics extends Service {
@@ -202,9 +203,15 @@ export default class Metrics extends Service {
    */
   _filterEnvironments(adapterOption, appEnvironment) {
     let { environments } = adapterOption;
+
+    if (typeOf(environments) === 'boolean') {
+      return environments;
+    } else if (typeOf(environments) === 'function') {
+      return environments();
+    }
+        
     environments = environments || ['all'];
     const wrappedEnvironments = emberArray(environments);
-
     return wrappedEnvironments.indexOf('all') > -1 || wrappedEnvironments.indexOf(appEnvironment) > -1;
   }
 }

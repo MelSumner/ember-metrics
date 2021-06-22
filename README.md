@@ -222,6 +222,16 @@ To only activate adapters in specific environments, you can add an array of envi
 - `production`
 - `all` (default, will be activated in all environments)
 
+You may also pass a boolean, or a function to the environments option. For example, you may wish to enable an adapter conditionally based upon an [Ember CLI Deploy](http://ember-cli-deploy.com/) `deployTarget`.
+
+```javascript
+ENV.metricsAdapters = [{
+  name: 'GoogleAnalytics',
+  environments: deployTarget === 'production',
+  // ...
+}];
+```
+
 ## Content Security Policy
 
 If you're using [ember-cli-content-security-policy](https://github.com/rwjblue/ember-cli-content-security-policy), you'll need to modify the content security policy to allow loading of any remote scripts.  In `config/environment.js`, add this to the `ENV` hash (modify as necessary):
